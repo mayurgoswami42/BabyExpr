@@ -1,4 +1,5 @@
 from .lexer import Lexer as lx
+from .status_manager import StatusManager, STATUS
 
 class Number:
     def __init__(self, value):
@@ -11,7 +12,8 @@ class BinaryOp:
         self.right = right
 
 class Parser:
-    def __init__(self):
+    def __init__(self, manager):
+        self.manager = manager
         self.text = ""
         self.data = list()
     
@@ -19,10 +21,6 @@ class Parser:
         highest = -1
         index = 0
         p_rank = 0
-
-        if (li[0][0] == '(' and li[0][2] == len(li) - 1):
-            li.pop(0)
-            li.pop()
 
         i = 0
         while i < len(li):
@@ -38,30 +36,37 @@ class Parser:
                 highest = li[i][1]
                 index = i
             i += 1
-        
+
+        if li[index][1] < 4 or li[index][1] > 8:
+            self.manager.throwE(f"PARSER::ERROR:: Unknown operator \"{li[index][0]}\"")
+
         return li[0:index], li[index], li[index+1:len(li)]
     
     def construct_tree(self, text = None, li = None):
         if (li == None):
             self.text = text
-            lexer = lx()
+            lexer = lx(self.manager)
             lexer.tokenize(self.text)
             self.data = lexer.labeled_data
             li = self.data
         
         if len(li) == 0:
-            print("PARSER::ERROR:: Need input!")
+            self.manager.throwE("PARSER::ERROR:: Need input!")
             return BinaryOp([], [], [])
+        
+        if (li[0][0] == '(' and li[0][2] == len(li) - 1):
+            li.pop(0)
+            li.pop()
 
         if len(li) == 1: return li[0]
         left, op, right = self.op_split(li)
 
         if (len(left) == 0):
-            print(f"PARSER::ERROR:: Expected a number before {op[0]}")
+            self.manager.throwE(f"PARSER::ERROR:: Expected a number before {op[0]}")
             return BinaryOp([], [], [])
 
         if (len(right) == 0):
-            print(f"PARSER::ERROR:: Expected a number after {op[0]}")
+            self.manager.throwE(f"PARSER::ERROR:: Expected a number after {op[0]}")
             return BinaryOp([], [], [])
         if (len(left) == 1 and len(right) == 1): return BinaryOp(op, left[0], right[0])
         else: return BinaryOp(op, self.construct_tree(li = left), self.construct_tree(li = right))

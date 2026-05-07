@@ -1,9 +1,12 @@
 from .tokens import Token
 from .parser import Parser, BinaryOp
+from .status_manager import StatusManager, STATUS
 
 class Evaluator:
-    def __init__(self):
-        self.parser = Parser()
+    def __init__(self, manager = None):
+        self.manager = manager
+        if self.manager == None: self.manager = StatusManager()
+        self.parser = Parser(self.manager)
         self.store = dict()
         
     def evaluate(self, text = None, tree = None):
@@ -16,8 +19,11 @@ class Evaluator:
                 if tree[0] in self.store.keys():
                     return float(self.store[tree[0]])
                 else:
-                    print(f"EVALUATOR::ERROR:: Undefined variable \"{tree[0]}\"")
+                    self.manager.throwE(f"EVALUATOR::ERROR:: Undefined variable \"{tree[0]}\"")
                     return 0
+            else:
+                self.manager.throwE(f"EVALUATOR::ERROR:: Bad Expression")
+                return 0
         
         if (type(tree.left) != BinaryOp and len(tree.left) == 0) or (type(tree.right) != BinaryOp and len(tree.right) == 0):
             return 0
@@ -30,7 +36,7 @@ class Evaluator:
         elif tree.op[1] == Token.DIV:
             right_side = self.evaluate(tree = tree.right)
             if right_side == 0:
-                print("EVALUATOR::ERROR:: Can't divide by 0!")
+                self.manager.throwE("EVALUATOR::ERROR:: Can't divide by 0!")
                 return 0
             else:
                 return self.evaluate(tree = tree.left) / self.evaluate(tree = tree.right)
@@ -39,5 +45,5 @@ class Evaluator:
                 self.store[tree.left[0]] = self.evaluate(tree = tree.right)
                 return self.store[tree.left[0]]
             else:
-                print("EVALUATOR::ERROR:: Bad expression lvalue expexted before = ")
+                self.manager.throwE("EVALUATOR::ERROR:: Bad expression lvalue expexted before = ")
                 return 0

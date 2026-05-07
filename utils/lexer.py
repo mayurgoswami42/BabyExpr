@@ -1,45 +1,55 @@
 from .tokens import Token as tk, TOKENS
 
 class Lexer:
-    def __init__(self):
+    def __init__(self, manager):
+        self.manager = manager
         self.text = ""
         self.labeled_data: list[list[str]] = list()
         self.pos = 0
-
-    def next_token(self):
-        if self.pos >= len(self.text):
-            return ['', tk.EOF]
+    
+    def get_token(self, pos, text):
+        if pos >= len(text):
+            return pos, ['', tk.EOF]
         
-        while self.pos < len(self.text) and self.text[self.pos] == ' ':
-            self.pos += 1
+        while pos < len(text) and text[pos] == ' ':
+            pos+=1
         
-        if self.text[self.pos] in TOKENS:
-            li = [self.text[self.pos], TOKENS[self.text[self.pos]]]
-            self.pos += 1
-            return li
+        if text[pos] in TOKENS:
+            li = [text[pos], TOKENS[text[pos]]]
+            pos += 1
+            return pos, li
         
         number = ""
-        while self.pos < len(self.text) and (self.text[self.pos]).isdigit():
-            number += self.text[self.pos]
-            self.pos += 1
-
-        if number != "":
-            return [number, tk.NUMBER]
+        is_int = True
+        while pos < len(text) and (text[pos].isdigit() or text[pos] == '.'):
+            if text[pos] == '.':
+                if number == "": number += "0"
+                is_int = False
+            number += text[pos]
+            pos += 1
         
-        alpha = ""
-        while self.pos < len(self.text) and (self.text[self.pos]).isalpha():
-            alpha += self.text[self.pos]
-            self.pos += 1
-
-        if alpha != "":
-            return [alpha, tk.IDENTIFIER]
+        if number != '':
+            if is_int:
+                return pos, [int(number), tk.NUMBER]
+            else: return pos, [float(number), tk.NUMBER]
         
-        return [self.text[self.pos], tk.UNDEFINED]
-    
+        var = ""
+        while pos < len(text) and text[pos].isalpha():
+            var += text[pos]
+            pos += 1
+        
+        if var != '':
+            return pos, [var, tk.IDENTIFIER]
+        
+        token = [text[pos], tk.UNDEFINED]
+        pos += 1
+        return pos, token
+
     def tokenize(self, text: str):
         p_indices = list()
+        text = str(text)
         self.text = text.strip()
-        next = self.next_token()
+        pos, next = self.get_token(0, text)
         while next[1] != tk.EOF:
             if next[0] == '(':
                 p_indices.append(len(self.labeled_data))
@@ -49,8 +59,8 @@ class Lexer:
                 self.labeled_data[pos_lp].append(pos_rp - pos_lp)
                 p_indices.pop()
             self.labeled_data.append(next)
-            next = self.next_token()
+            pos, next = self.get_token(pos, text)
         
         if len(p_indices) != 0:
-            print("LEXER::ERROR:: Expected a \")\"")
+            self.manager.throwE("LEXER::ERROR:: Expected a \")\"")
             return
