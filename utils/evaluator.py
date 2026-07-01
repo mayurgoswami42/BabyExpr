@@ -1,6 +1,6 @@
 from .tokens import Token
 from .parser import Parser, BinaryOp
-from .status_manager import StatusManager, STATUS
+from .status_manager import StatusManager
 
 class Evaluator:
     def __init__(self, manager = None):
