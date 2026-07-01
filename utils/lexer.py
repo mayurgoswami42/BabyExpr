@@ -21,13 +21,18 @@ class Lexer:
         
         number = ""
         is_int = True
-        while pos < len(text) and (text[pos].isdigit() or text[pos] == '.'):
+        while pos < len(text) and text[pos] in "0123456789.e":
+            if text[pos] == 'e':
+                if pos+1 < len(text) and text[pos+1] in "+-":
+                    number += text[pos]
+                    pos += 1
+
             if text[pos] == '.':
                 if number == "": number += "0"
                 is_int = False
             number += text[pos]
             pos += 1
-        
+
         if number != '':
             if is_int:
                 return pos, [int(number), tk.NUMBER]

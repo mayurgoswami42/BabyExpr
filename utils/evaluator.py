@@ -7,7 +7,7 @@ class Evaluator:
         self.manager = manager
         if self.manager == None: self.manager = StatusManager()
         self.parser = Parser(self.manager)
-        self.store = dict()
+        self.store = {"inf" : "infinite", "nan" : "undefined"}
         
     def evaluate(self, text = None, tree = None):
         if tree == None:
@@ -17,7 +17,10 @@ class Evaluator:
                 return float(tree[0])
             elif tree[1] == Token.IDENTIFIER:
                 if tree[0] in self.store.keys():
-                    return float(self.store[tree[0]])
+                    try:
+                        return float(self.store[tree[0]])
+                    except:
+                        return self.store[tree[0]]
                 else:
                     self.manager.throwE(f"EVALUATOR::ERROR:: Undefined variable \"{tree[0]}\"")
                     return 0
