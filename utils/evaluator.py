@@ -21,10 +21,8 @@ class Evaluator:
                         return float(self.store[tree[0]])
                     except Exception as e:
                         self.manager.throwE(f"EVALUATOR::ERROR:: Exception \"{e}\"")
-                        return self.store[tree[0]]
                 else:
                     self.manager.throwE(f"EVALUATOR::ERROR:: Undefined variable \"{tree[0]}\"")
-                    return 0
             else:
                 self.manager.throwE(f"EVALUATOR::ERROR:: Bad Expression")
                 return 0

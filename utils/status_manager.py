@@ -12,6 +12,7 @@ class StatusManager:
     def force_good_state(self):
         self._status = STATUS.GOOD
 
-    def throwE(self, exceptation):
-        print(exceptation)
+    def throwE(self, expectation):
+        print(expectation)
         self._status = STATUS.BAD
+        raise Exception(expectation)
