@@ -1,0 +1,40 @@
+name: 🌱 Good First Issue
+description: A small, beginner-friendly task (usually authored by a maintainer)
+title: "[Good First Issue]: "
+labels: ["good first issue"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This template is for small, well-scoped tasks meant for first-time contributors.
+        New to GitHub? Check the [CONTRIBUTING.md](../../blob/main/CONTRIBUTING.md) guide first — it walks through forking, branching, and opening a PR step by step.
+
+  - type: textarea
+    id: task
+    attributes:
+      label: Task
+      description: What needs to be done?
+      placeholder: e.g. "Add support for the modulo (%) operator in the lexer and parser"
+    validations:
+      required: true
+
+  - type: textarea
+    id: hints
+    attributes:
+      label: Hints / where to start
+      description: Point them to the relevant file(s) or function(s)
+      placeholder: e.g. "Look at how `+` and `-` are handled in Lexer.tokenize() and Parser.parse_expression()"
+    validations:
+      required: false
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: How do we know it's done?
+      placeholder: |
+        - [ ] `5 % 2` evaluates to `1`
+        - [ ] A test is added in tests/test_evaluator.py
+        - [ ] README examples updated (if applicable)
+    validations:
+      required: false
