@@ -9,7 +9,7 @@ class Evaluator:
         self.parser = Parser(self.manager)
         self.store = {"inf" : "infinite", "nan" : "undefined"}
         
-    def evaluate(self, text = None, tree = None):
+    def evaluate(self, text = None, tree = None, left_value = False):
         if tree is None:
             tree = self.parser.construct_tree(text)
         if not isinstance(tree, BinaryOp):
@@ -21,14 +21,16 @@ class Evaluator:
                         return float(self.store[tree[0]])
                     except Exception as e:
                         self.manager.throwE(f"EVALUATOR::ERROR:: Exception \"{e}\"")
+                elif left_value:
+                    return tree
                 else:
                     self.manager.throwE(f"EVALUATOR::ERROR:: Undefined variable \"{tree[0]}\"")
             else:
                 self.manager.throwE(f"EVALUATOR::ERROR:: Bad Expression")
                 return 0
 
-        left_side = self.evaluate(tree = tree.left)
-        right_side = self.evaluate(tree = tree.right)
+        left_side = self.evaluate(tree = tree.left, left_value = True)
+        right_side = self.evaluate(tree = tree.right, left_value = False)
         
         if (not isinstance(tree.left, BinaryOp) and len(tree.left) == 0) or (not isinstance(tree.right, BinaryOp) and len(tree.right) == 0):
             return 0
@@ -49,5 +51,5 @@ class Evaluator:
                 self.store[tree.left[0]] = right_side
                 return self.store[tree.left[0]]
             else:
-                self.manager.throwE("EVALUATOR::ERROR:: Bad expression lvalue expexted before = ")
+                self.manager.throwE("EVALUATOR::ERROR:: Bad expression lvalue expected before = ")
                 return 0
