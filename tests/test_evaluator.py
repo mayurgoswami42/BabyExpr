@@ -28,6 +28,9 @@ class TestEvaluator(unittest.TestCase):
 
     def test_left_to_right_same_precedence(self):
         self.assertEqual(evaluator.evaluate("20 / 2 / 2"), 5)
+        self.assertEqual(evaluator.evaluate("10 - 4 - 2"), 4)
+        self.assertEqual(evaluator.evaluate("24 / 2 / 3 / 2"), 2)
+        self.assertEqual(evaluator.evaluate("10 - 2 + 3"), 11)
 
     # ---------- Parentheses ----------
     def test_parentheses(self):

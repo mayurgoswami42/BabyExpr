@@ -1,4 +1,5 @@
 from .lexer import Lexer as lx
+from .tokens import Token as tk, OPERATOR_PRECEDENCE
 
 class Number:
     def __init__(self, value):
@@ -19,26 +20,32 @@ class Parser:
     # splitting the expression by operator, 3 + 2 * 4 => left: 3 + 2 | operator: * | right: 4
     def op_split(self, li: list):
         highest = -1
-        index = 0
+        index = -1
         parenthesis_depth = 0
 
         i = 0
         while i < len(li):
             if li[i][0] == '(':
                 parenthesis_depth += 1
-            elif li[i][0] == ')': parenthesis_depth -= 1
+            elif li[i][0] == ')':
+                parenthesis_depth -= 1
 
             if parenthesis_depth > 0:
                 i += 1
                 continue
 
-            if li[i][1] > highest:
-                highest = li[i][1]
-                index = i
+            token_type = li[i][1]
+            if token_type in OPERATOR_PRECEDENCE:
+                prec = OPERATOR_PRECEDENCE[token_type]
+                # For left-associative operators (MUL, DIV, PLUS, MINUS), split at rightmost operator (>=).
+                # For right-associative operators (EQUAL), split at leftmost operator (>).
+                if prec > highest or (prec == highest and token_type != tk.EQUAL):
+                    highest = prec
+                    index = i
             i += 1
 
-        if li[index][1] < 4 or li[index][1] > 8:
-            self.manager.throwE(f"PARSER::ERROR:: Unknown operator \"{li[index][0]}\"")
+        if index == -1 or li[index][1] < tk.MUL or li[index][1] > tk.EQUAL:
+            self.manager.throwE(f"PARSER::ERROR:: Unknown operator \"{li[index][0] if index != -1 else 'none'}\"")
 
         return li[0:index], li[index], li[index+1:len(li)]
 

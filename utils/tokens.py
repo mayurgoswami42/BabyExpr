@@ -20,3 +20,11 @@ TOKENS = {
     '(': Token.LPAREN,
     ')': Token.RPAREN
 }
+
+OPERATOR_PRECEDENCE = {
+    Token.EQUAL: 3,
+    Token.PLUS: 2,
+    Token.MINUS: 2,
+    Token.MUL: 1,
+    Token.DIV: 1,
+}
