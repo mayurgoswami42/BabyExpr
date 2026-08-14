@@ -28,6 +28,12 @@ class TestEvaluator(unittest.TestCase):
 
     def test_left_to_right_same_precedence(self):
         self.assertEqual(evaluator.evaluate("20 / 2 / 2"), 5)
+        self.assertEqual(evaluator.evaluate("8 / 4 * 2"), 4)
+        self.assertEqual(evaluator.evaluate("10 - 3 + 2"), 9)
+
+    def test_chained_assignment_is_right_associative(self):
+        self.assertEqual(evaluator.evaluate("left = right = 4"), 4)
+        self.assertEqual(evaluator.evaluate("left + right"), 8)
 
     # ---------- Parentheses ----------
     def test_parentheses(self):

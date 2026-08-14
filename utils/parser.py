@@ -1,4 +1,15 @@
 from .lexer import Lexer as lx
+from .tokens import Token as tk
+
+OPERATOR_PRECEDENCE = {
+    tk.MUL: 4,
+    tk.DIV: 4,
+    tk.PLUS: 6,
+    tk.MINUS: 6,
+    tk.EQUAL: 8,
+}
+
+RIGHT_ASSOCIATIVE_OPERATORS = {tk.EQUAL}
 
 class Number:
     def __init__(self, value):
@@ -32,8 +43,12 @@ class Parser:
                 i += 1
                 continue
 
-            if li[i][1] > highest:
-                highest = li[i][1]
+            precedence = OPERATOR_PRECEDENCE.get(li[i][1], li[i][1])
+            if precedence > highest or (
+                precedence == highest
+                and li[i][1] not in RIGHT_ASSOCIATIVE_OPERATORS
+            ):
+                highest = precedence
                 index = i
             i += 1
 
